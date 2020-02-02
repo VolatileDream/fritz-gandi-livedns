@@ -22,6 +22,10 @@ You'll need an API Key from Gandi.net:
   * Account > Security > Generate API Key
   * Insert the api key into `config.py`
 
+You need to setup the service with systemd / etc.
+  * Copy `dyndns.service` into `/etc/systemd/system`
+  * Edit dyndns.service with the user & directory you want to run it as.
+
 ## Using HTTPS?
 
 Can the Fritz!Box be configured to talk to my local service using HTTPS?
