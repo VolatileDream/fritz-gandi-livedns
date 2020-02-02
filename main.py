@@ -128,6 +128,8 @@ def get_current():
   subdomain = request.args.get('subdomain')
   ip4 = request.args.get('ip4', None)
   ip6 = request.args.get('ip6', None)
+  if not domain or not subdomain or (not ip4 and not ip6):
+    abort(400)
   return str(current_registration(domain, subdomain, ip4, ip6))
 
 
@@ -137,6 +139,8 @@ def force_update():
   subdomain = request.args.get('subdomain')
   ip4 = request.args.get('ip4', None)
   ip6 = request.args.get('ip6', None)
+  if not domain or not subdomain or (not ip4 and not ip6):
+    abort(400)
   return update_registration(domain, subdomain, ip4=ip4, ip6=ip6)
 
 
