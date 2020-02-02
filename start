@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+prg=`dirname "$0"`
+source "${prg}/.venv/bin/activate"
+gunicorn "main:app" "$@"
