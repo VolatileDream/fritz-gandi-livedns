@@ -10,7 +10,7 @@ Enable DynDns:
   * Internet > Permit Access > DynDNS
   * Check "Use DynDNS"
   * "DynDNS Provider" = User-defined
-  * "Update URL" = <local ip/name of the updater>
+  * "Update URL" = `"http://" + host_port + "/update?domain=<domain>&ip4=<ipaddr>&ip6=<ip6addr>&subdomain=" + subdomain`
   * "Domain name" = <your domain here>
   * "User name" = unused
   * "Password" = unused
@@ -20,7 +20,7 @@ Enable DynDns:
 You'll need an API Key from Gandi.net:
   * Login to Gandi.net
   * Account > Security > Generate API Key
-  *
+  * Insert the api key into `config.py`
 
 ## Using HTTPS?
 
