@@ -144,5 +144,9 @@ def force_update():
   return update_registration(domain, subdomain, ip4=ip4, ip6=ip6)
 
 
+@app.route('/echo')
+def echo():
+  return "echo"
+
 def create_app():
   return app
