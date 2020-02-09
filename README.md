@@ -10,8 +10,8 @@ Enable DynDns:
   * Internet > Permit Access > DynDNS
   * Check "Use DynDNS"
   * "DynDNS Provider" = User-defined
-  * "Update URL" = `"http://" + host_port + "/update?domain=<domain>&ip4=<ipaddr>&ip6=<ip6addr>&subdomain=" + subdomain`
-  * "Domain name" = <your domain here>
+  * "Update URL" = `"http://" + host_port + "/update?domain=" + domain + "&ip4=<ipaddr>&ip6=<ip6addr>&subdomain=" + subdomain`
+  * "Domain name" = subdomain + "." + domain
   * "User name" = unused
   * "Password" = unused
 
