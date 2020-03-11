@@ -6,15 +6,14 @@ import requests, json, config
 gandi_api = 'https://api.gandi.net'
 #gandi_api = 'http://localhost:5000'
 
-def headers(d=None):
+def headers(api_key, d=None):
   h = {
     'Connection': None,
     #'User-Agent': 'curl/7.65.3',
-    'Authorization': 'Apikey ' + config.api_key,
+    'Authorization': 'Apikey ' + api_key
   }
   if d is not None:
     h.update(d)
-  print(h)
   return h
 
 def ip_type(ip4=None, ip6=None):
@@ -41,7 +40,7 @@ def update_registration(domain, subdomain, ip4=None, ip6=None):
     app.logger.error('No valid IPs passed to update_registration')
     return False
 
-  h = headers()
+  h = headers(config.api_key)
   payload = {
     'rrset_name': subdomain,
     'rrset_type': ip_type(ip4, ip6),
@@ -49,7 +48,7 @@ def update_registration(domain, subdomain, ip4=None, ip6=None):
     'rrset_values': values,
   }
 
-  response = requests.put(u, json=payload, headers=headers())
+  response = requests.put(u, json=payload, headers=headers(config.api_key))
   if response.status_code != 200 and response.status_code != 201:
     app.logger.error('Error updating ip for record: %s\n%s' % (u, response._content))
     return False
@@ -60,7 +59,7 @@ def update_registration(domain, subdomain, ip4=None, ip6=None):
 def current_registration(domain, subdomain, ip4=None, ip6=None):
   u = url(domain, subdomain, ip4, ip6)
 
-  response = requests.get(u, headers=headers())
+  response = requests.get(u, headers=headers(config.api_key))
   if response.status_code != 200:
     app.logger.error('Error checking ip from record: %s\n%s' % (subdomain, response._content))
     return False
