@@ -92,6 +92,11 @@ def common(fn):
   subdomain = request.args.get('subdomain', None)
   ip4 = request.args.get('ip4', None)
   ip6 = request.args.get('ip6', None)
+  # While you _could_ change this to take the api_key in the request
+  # parameters, you would need to ensure there was some sort of
+  # security on the transport like HTTPS or something else. Don't
+  # change this without doing that, or you expose your Gandi.net API
+  # key to your network.
   api_key = config.api_key
 
   if not api_key:
