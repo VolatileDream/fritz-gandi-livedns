@@ -6,14 +6,14 @@ import requests, json, config
 gandi_api = 'https://api.gandi.net'
 #gandi_api = 'http://localhost:5000'
 
-def headers(api_key, d=None):
+def headers(api_key, override=None):
   h = {
     'Connection': None,
     #'User-Agent': 'curl/7.65.3',
     'Authorization': 'Apikey ' + api_key
   }
-  if d is not None:
-    h.update(d)
+  if override is not None:
+    h.update(override)
   return h
 
 def ip_type(ip4=None, ip6=None):
