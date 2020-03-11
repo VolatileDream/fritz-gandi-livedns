@@ -7,7 +7,7 @@ After=basic.target network.target
 User=<>
 ExecStart=<>/fritz-gandi-livedns/start -b 0.0.0.0:8080
 ExecReload=/bin/kill -HUP $MAINPID
-KillMode=process
+KillMode=control-group
 Restart=always
 RestartSec=18s
 
