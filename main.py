@@ -87,14 +87,7 @@ def try_update_ip(domain, subdomain, ip4=None, ip6=None):
   return 'no-update'
 
 
-@app.route('/update')
-def update_with_params():
-  """Router is updating the ip addr.
-
-  It's unclear exactly when/why the Fritz!Box invokes this endpoint,
-  so we check if the parameters given match the current content of the
-  DNS record, and update them if they don't.
-  """
+def common(fn):
   domain = request.args.get('domain', None)
   subdomain = request.args.get('subdomain', None)
   ip4 = request.args.get('ip4', None)
@@ -103,16 +96,37 @@ def update_with_params():
   if not domain or not subdomain or (not ip4 and not ip6):
     abort(400)
 
-  status4 = 'not-provided'
-  status6 = 'not-provided'
+  status4 = None
+  status6 = None
 
   if ip4:
-    status4 = try_update_ip(domain, subdomain, ip4=ip4)
+    status4 = fn(domain, subdomain, ip4=ip4)
 
   if ip6:
-    status6 = try_update_ip(domain, subdomain, ip6=ip6)
+    status6 = fn(domain, subdomain, ip6=ip6)
+
+  return (status4, status6)
 
 
+@app.route('/update')
+def update_with_params():
+  """Router is updating the ip addr.
+
+  It's unclear exactly when/why the Fritz!Box invokes this endpoint,
+  so we check if the parameters given match the current content of the
+  DNS record, and update them if they don't.
+  """
+
+  status4, status6 = common(try_update_ip)
+
+  if not status4:
+    status4 = 'not-provided'
+
+  if not status6:
+    status6 = 'not-provided'
+
+  domain = request.args.get('domain', None)
+  subdomain = request.args.get('subdomain', None)
   return {
     'domain': domain,
     'subdomain': subdomain,
@@ -123,44 +137,29 @@ def update_with_params():
 
 @app.route('/current')
 def get_current():
-  domain = request.args.get('domain')
-  subdomain = request.args.get('subdomain')
-  ip4 = request.args.get('ip4', None)
-  ip6 = request.args.get('ip6', None)
-
-  if not domain or not subdomain or (not ip4 and not ip6):
-    abort(400)
+  status4, status6 = common(current_registration)
 
   result = []
-
-  if ip4:
-    result.append(current_registration(domain, subdomain, ip4=True))
-
-  if ip6:
-    result.append(current_registration(domain, subdomain, ip6=True))
+  if status4:
+    result.append(status4)
+  if status6:
+    result.append(status6)
 
   return str(result)
 
 
 @app.route('/force')
 def force_update():
-  domain = request.args.get('domain')
-  subdomain = request.args.get('subdomain')
-  ip4 = request.args.get('ip4', None)
-  ip6 = request.args.get('ip6', None)
-
-  if not domain or not subdomain or (not ip4 and not ip6):
-    abort(400)
+  status4, status6 = common(update_registration)
 
   result = []
+  if status4:
+    result.append(status4)
+  if status6:
+    result.append(status6)
 
-  if ip4:
-    result.append(update_registration(domain, subdomain, ip4=ip4))
+  return str(result)
 
-  if ip4:
-    result.append(update_registration(domain, subdomain, ip6=ip6))
-
-  return result
 
 @app.route('/echo')
 def echo():
