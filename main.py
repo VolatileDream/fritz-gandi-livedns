@@ -16,6 +16,7 @@ def headers(api_key, override=None):
     h.update(override)
   return h
 
+
 def ip_type(ip4=None, ip6=None):
   if ip4:
     return 'A'
@@ -167,6 +168,7 @@ def force_update():
 @app.route('/echo')
 def echo():
   return "echo"
+
 
 def create_app():
   return app
