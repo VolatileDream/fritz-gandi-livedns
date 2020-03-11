@@ -29,7 +29,7 @@ def url(domain, subdomain, ip4=None, ip6=None):
   return gandi_api + '/v5/livedns/domains/%s/records/%s/%s' % (domain, subdomain, t)
   
 
-def update_registration(domain, subdomain, ip4=None, ip6=None):
+def update_registration(domain, subdomain, ip4=None, ip6=None, api_key=None):
   u = url(domain, subdomain, ip4, ip6)
   values = []
   if ip4:
@@ -40,7 +40,6 @@ def update_registration(domain, subdomain, ip4=None, ip6=None):
     app.logger.error('No valid IPs passed to update_registration')
     return False
 
-  h = headers(config.api_key)
   payload = {
     'rrset_name': subdomain,
     'rrset_type': ip_type(ip4, ip6),
@@ -48,7 +47,7 @@ def update_registration(domain, subdomain, ip4=None, ip6=None):
     'rrset_values': values,
   }
 
-  response = requests.put(u, json=payload, headers=headers(config.api_key))
+  response = requests.put(u, json=payload, headers=headers(api_key))
   if response.status_code != 200 and response.status_code != 201:
     app.logger.error('Error updating ip for record: %s\n%s' % (u, response._content))
     return False
@@ -56,10 +55,10 @@ def update_registration(domain, subdomain, ip4=None, ip6=None):
   return json.loads(response._content)
 
 
-def current_registration(domain, subdomain, ip4=None, ip6=None):
+def current_registration(domain, subdomain, ip4=None, ip6=None, api_key=None):
   u = url(domain, subdomain, ip4, ip6)
 
-  response = requests.get(u, headers=headers(config.api_key))
+  response = requests.get(u, headers=headers(api_key))
   if response.status_code != 200:
     app.logger.error('Error checking ip from record: %s\n%s' % (subdomain, response._content))
     return False
@@ -68,9 +67,9 @@ def current_registration(domain, subdomain, ip4=None, ip6=None):
   return j
 
 
-def try_update_ip(domain, subdomain, ip4=None, ip6=None):
+def try_update_ip(domain, subdomain, ip4=None, ip6=None, api_key=None):
   t = ip_type(ip4, ip6)
-  resp = current_registration(domain, subdomain, ip4=ip4, ip6=ip6)
+  resp = current_registration(domain, subdomain, ip4=ip4, ip6=ip6, api_key=api_key)
   if not resp:
     app.logger.error('Unable to fetch current registration for type: %s' % t)
     return
@@ -78,7 +77,7 @@ def try_update_ip(domain, subdomain, ip4=None, ip6=None):
   addrs = set(resp['rrset_values'])
 
   if (ip4 and ip4 not in addrs) or (ip6 and ip6 not in addrs):
-    if not update_registration(domain, subdomain, ip4=ip4, ip6=ip6):
+    if not update_registration(domain, subdomain, ip4=ip4, ip6=ip6, api_key=api_key):
       app.logger.error('Unable to update: %s for %s.%s' %(t, subdomain, domain))
       return 'error'
     else:
@@ -92,6 +91,10 @@ def common(fn):
   subdomain = request.args.get('subdomain', None)
   ip4 = request.args.get('ip4', None)
   ip6 = request.args.get('ip6', None)
+  api_key = config.api_key
+
+  if not api_key:
+    abort(403)
 
   if not domain or not subdomain or (not ip4 and not ip6):
     abort(400)
@@ -100,10 +103,10 @@ def common(fn):
   status6 = None
 
   if ip4:
-    status4 = fn(domain, subdomain, ip4=ip4)
+    status4 = fn(domain, subdomain, ip4=ip4, api_key=api_key)
 
   if ip6:
-    status6 = fn(domain, subdomain, ip6=ip6)
+    status6 = fn(domain, subdomain, ip6=ip6, api_key=api_key)
 
   return (status4, status6)
 
