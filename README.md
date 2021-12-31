@@ -1,3 +1,7 @@
+# Discontinued
+
+I'm no longer using a Fritz!Box router for my dynamic DNS. I've switched to using a polling based solution, rather than being able to rely on a router that can broadcast updates somewhere.
+
 # Fritz!Box Dynamic DNS for Gandi.net LiveDns
 
 A small Flask service that accepts requests from the Fritz!Box
