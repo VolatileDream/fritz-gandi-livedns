@@ -22,6 +22,11 @@ You'll need an API Key from Gandi.net:
   * Account > Security > Generate API Key
   * Insert the api key into `config.py`
 
+You need to specify which domains & subdomains can be updated:
+ * Open `config.py`
+ * Edit the `allowed` dictionary
+ * Insert your domain as key, and subdomain into the subdomain set.
+
 You need to setup the service with systemd / etc.
   * Copy `dyndns.service` into `/etc/systemd/system`
   * Edit dyndns.service with the user & directory you want to run it as.

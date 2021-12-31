@@ -6,6 +6,10 @@ import requests, json, config
 gandi_api = 'https://api.gandi.net'
 #gandi_api = 'http://localhost:5000'
 
+def allowed(domain, subdomain):
+  return subdomain in config.allowed.get(domain, set())
+
+
 def headers(api_key, override=None):
   h = {
     'Connection': None,
@@ -27,6 +31,9 @@ def ip_type(ip4=None, ip6=None):
 
 def url(domain, subdomain, ip4=None, ip6=None):
   t = ip_type(ip4, ip6)
+  if not allowed(domain, subdomain):
+    # Not allowed to request this.
+    abort(401)
   return gandi_api + '/v5/livedns/domains/%s/records/%s/%s' % (domain, subdomain, t)
   
 
@@ -104,6 +111,10 @@ def common(fn):
 
   if not domain or not subdomain or (not ip4 and not ip6):
     abort(400)
+
+  if not allowed(domain, subdomain):
+    # Not allowed to request this.
+    abort(401)
 
   status4 = None
   status6 = None
